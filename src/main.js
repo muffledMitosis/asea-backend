@@ -1,21 +1,53 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const fs = require('fs');
-const credentials = fs.readFileSync('./test_user.pem');
-const client = new MongoClient('mongodb://ac-lktdlyl-shard-00-00.jfxqmip.mongodb.net:27017,ac-lktdlyl-shard-00-01.jfxqmip.mongodb.net:27017,ac-lktdlyl-shard-00-02.jfxqmip.mongodb.net:27017/?ssl=true&replicaSet=atlas-jwszxv-shard-0&authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority', {
-  sslKey: credentials,
-  sslCert: credentials
+import * as database from './db/db.js';
+
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import express from 'express';
+
+
+const {client, db} = await database.connect();
+const ProductsColl = db.collection("Products");
+const docCount = await ProductsColl.countDocuments({});
+console.log(docCount);
+
+const app = express();
+
+// user body-parser as middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// Allow cross origin requests from the frontend
+app.use(cors(), function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
 });
-async function run() {
-  try {
-    await client.connect();
-    const database = client.db("testDB");
-    const collection = database.collection("testCol");
-    const docCount = await collection.countDocuments({});
-    console.log(docCount);
-    // perform actions using client
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-run().catch(console.dir);
+
+app.get('/', (req, res)=>{
+  res.send('lol');
+});
+
+app.post('/add-product', async (req, res)=>{
+  await ProductsColl.insertOne(req.body);
+  console.log(req.body);
+});
+
+
+app.get('/products', async (req, res)=>{
+  let prods = [];
+  const cursor = ProductsColl.find();
+  await cursor.forEach(doc => prods.push(doc));
+  console.log(prods);
+  res.send(prods);
+})
+
+app.listen(8080, ()=>{
+  console.log('server up');
+})
+
+// await client.close();
+
+
