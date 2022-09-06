@@ -36,6 +36,10 @@ app.post('/add-product', async (req, res)=>{
   res.send(":)");
 });
 
+// app.get('/get-from-sku/:sku', async (req, res)=>{
+//   let sku = Buffer.from(req.params.sku, "base64").toString('utf8');
+//   console.log(sku);
+// });
 
 app.get('/products', async (req, res)=>{
   let prods = [];
