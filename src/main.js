@@ -33,6 +33,7 @@ app.get('/', (req, res)=>{
 app.post('/add-product', async (req, res)=>{
   await ProductsColl.insertOne(req.body);
   console.log(req.body);
+  res.send(":)");
 });
 
 
