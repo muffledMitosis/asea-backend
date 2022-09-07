@@ -3,6 +3,7 @@ import * as database from './db/db.js';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import express from 'express';
+import multer from 'multer';
 
 
 const {client, db} = await database.connect();
@@ -31,7 +32,7 @@ app.get('/', (req, res)=>{
 });
 
 app.post('/add-product', async (req, res)=>{
-  await ProductsColl.insertOne(req.body);
+  // await ProductsColl.insertOne(req.body);
   console.log(req.body);
   res.send(":)");
 });
